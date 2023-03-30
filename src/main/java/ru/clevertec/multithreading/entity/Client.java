@@ -1,6 +1,7 @@
 package ru.clevertec.multithreading.entity;
 
 import lombok.SneakyThrows;
+import ru.clevertec.multithreading.util.RandomNumberGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,6 @@ public class Client {
 
     private final List<Integer> requests;
     private final AtomicInteger accumulator;
-    private final Random random;
     private final Lock locker;
     private final ExecutorService executorService;
     private final Integer requestsSize;
@@ -30,17 +30,12 @@ public class Client {
         this.accumulator = new AtomicInteger(0);
         this.executorService = Executors.newFixedThreadPool(numberOfElements);
         this.requestsSize = numberOfElements;
-        this.random = new Random();
         this.locker = new ReentrantLock();
-    }
-
-    public int generateRandomNumber(int min, int max) {
-        return random.nextInt(max - min) + min;
     }
 
     public Request generateRequest(List<Integer> requests) {
         locker.lock();
-        int randomNumber = generateRandomNumber(0, requests.size());
+        int randomNumber = RandomNumberGenerator.generate(0, requests.size());
         int removedValue = requests.remove(randomNumber);
         Request request = new Request(removedValue);
         locker.unlock();
